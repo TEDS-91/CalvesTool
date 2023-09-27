@@ -7,37 +7,34 @@
 app_server <- function(input, output, session) {
   # Your application server logic
 
-  set.seed(122)
-  histdata <- rnorm(500)
-
   histo <- reactive({
 
-    data.frame(calf_id = seq(1, 100, 1),
-               avg30d = rnorm(100, 0.5, 0.1),
-               avdg60d = rnorm(100, 0.7, 0.1),
-               avdg90g = rnorm(100, 0.8, 0.1))
+    expand.grid(calf_id = seq(1, 30, 1),
+                age_d = c(1, 30, 60)) %>%
+      dplyr::bind_cols(weight = c(rnorm(30, 35, 2),
+                                  rnorm(30, 50, 3),
+                                  rnorm(30, 70, 4)))
 
-  })
-
-  output$plot1 <- renderPlot({
-    data <- histdata[seq_len(input$slider)]
-    hist(data)
   })
 
   output$tabela <- renderTable({
 
-    histo() |>
-      dplyr::slice(1:input$slider)
+    histo() %>%
+      dplyr::filter(calf_id %in% c(seq(1, input$slider)))
 
   })
 
-  output$histograma <- renderPlot({
+  output$histograma <- plotly::renderPlotly({
 
-    histo() |>
-      dplyr::slice(1:input$slider) |>
-      ggplot2::ggplot( ggplot2::aes(x = avg30d)) +
-      ggplot2::geom_histogram()
-
+    plotly::ggplotly(
+    histo() %>%
+      dplyr::filter(calf_id %in% c(seq(1, input$slider))) %>%
+      dplyr::mutate(calf_id = as.factor(calf_id)) %>%
+      ggplot2::ggplot( ggplot2::aes(x = age_d, y = weight, col = calf_id)) +
+      ggplot2::theme_bw() +
+      ggplot2::geom_point() +
+      ggplot2::geom_line(ggplot2::aes(x = age_d, y = weight, col = calf_id))
+)
   })
 
 

@@ -35,23 +35,36 @@ app_ui <- function(request) {
 
           bs4Dash::bs4TabItem(
             tabName = "herd_calibration",
+
             fluidRow(
-              bs4Dash::box(plotOutput("plot1", height = 250)),
-
-              bs4Dash::box(
-                title = "Controls",
-                sliderInput("slider", "Number of observations:", 1, 100, 50)
-              ),
-              bs4Dash::box(
-                title = "Performance",
-                tableOutput("tabela")
-              ),
-              bs4Dash::box(
-                title = "Performance",
-                plotOutput("histograma")
+              bs4Dash::valueBox(
+                30,
+                "Calves",
+                color = "olive",
+                icon = tags$i(fontawesome::fa("cow"))
               )
+            ),
+            fluidRow(
 
-              ),
+              bs4Dash::box(
+                title = "Calf Filtering",
+                sliderInput("slider", "Calf ID:", 1, 30, 20)
+              )),
+
+            fluidRow(
+              bs4Dash::box(
+                title = "Performance",
+                plotly::plotlyOutput("histograma"),
+                  width = 8
+              )),
+
+            fluidRow(
+              bs4Dash::box(
+                title = "Performance",
+                tableOutput("tabela"),
+                width = 12
+              ))
+
 
               ),
 
